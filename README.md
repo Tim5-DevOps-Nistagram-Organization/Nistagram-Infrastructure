@@ -3,7 +3,7 @@
 The repository contains:
 
 1. Service Discovery
-2. Data for monitoring
+2. Monitoring Service
 3. Startup scripts
 
 System architecture:
