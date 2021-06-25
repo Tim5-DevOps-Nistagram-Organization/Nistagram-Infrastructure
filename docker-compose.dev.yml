@@ -1,0 +1,261 @@
+version: "3.8"
+services:
+    database:
+      image: postgres:${POSTGRES_VERSION-13}
+      container_name: postgres
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_DB: ${POSTGRES_DB}
+      volumes:
+        - database-data:/var/lib/postgresql/data
+      networks:
+        - nistagram-static-network
+      ports:
+        - 5432
+      depends_on:
+        - nistagram-consul-server
+
+    nistagram-consul-server:
+      image: consul-server
+      container_name: nistagram-consul-server
+      build:
+        context: .
+        dockerfile: Dockerfile
+        target: consulServerDev
+      ports: 
+        - "8501:8500"
+      networks:
+        nistagram-static-network:
+          ipv4_address: 172.19.0.2
+ 
+    nistagram-gateway:
+      image: gateway-nistagram
+      build:
+        context: .
+        dockerfile: Dockerfile
+        target: gatewayRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8088:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    # each microservice has own Dockerfile which we use here
+    nistagram-auth-service:
+      image: auth-service-nistagram
+      build:
+        context: ./Nistagram-Auth
+        dockerfile: Dockerfile
+        target: nistagramAuthMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8082:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    # each microservice has own Dockerfile which we use here
+    nistagram-campaign-service:
+      image: campaign-service-nistagram
+      build:
+        context: ./Nistagram-Campaign
+        dockerfile: Dockerfile
+        target: nistagramCampaignMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8083:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    # each microservice has own Dockerfile which we use here
+    nistagram-media-service:
+      image: media-service-nistagram
+      build:
+        context: ./Nistagram-Media
+        dockerfile: Dockerfile
+        target: nistagramMediaMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8084:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    # each microservice has own Dockerfile which we use here
+    nistagram-post-service:
+      image: post-service-nistagram
+      build:
+        context: ./Nistagram-Post
+        dockerfile: Dockerfile
+        target: nistagramPostMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8085:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    # each microservice has own Dockerfile which we use here
+    nistagram-search-service:
+      image: search-service-nistagram
+      build:
+        context: ./Nistagram-Search
+        dockerfile: Dockerfile
+        target: nistagramSearchMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8086:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    # each microservice has own Dockerfile which we use here
+    nistagram-user-service:
+      image: user-service-nistagram
+      build:
+        context: ./Nistagram-User
+        dockerfile: Dockerfile
+        target: nistagramUserMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8087:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+
+
+  # # ===================>> monitoring services <<======================
+    nistagram-prometheus:
+      image: prom/prometheus:latest
+      container_name: prometheus
+      ports:
+        - 9090:9090
+      command:
+        - --config.file=/etc/prometheus/prometheus.yml
+      volumes:
+        - ./monitoring/prometheus/:/etc/prometheus/
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - nistagram-cadvisor
+        - nistagram-node-exporter
+
+    # monitor Linux machine
+    nistagram-node-exporter:
+      image: prom/node-exporter:v1.1.2
+      container_name: node-exporter
+      networks:
+        - nistagram-static-network
+      ports:
+        - 9100:9100
+      depends_on:
+        - nistagram-consul-server
+        - nistagram-cadvisor
+
+    # monitor containers
+    nistagram-cadvisor:
+      image: gcr.io/cadvisor/cadvisor:latest
+      container_name: cadvisor
+      ports:
+        - 8081:8080
+      volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - nistagram-user-service
+        - nistagram-search-service
+        - nistagram-gateway
+        - nistagram-auth-service
+        - nistagram-campaign-service
+        - nistagram-media-service
+        - nistagram-post-service
+
+    # visualise monitoring
+    nistagram-grafana:
+      image: grafana/grafana:8.0.3
+      container_name: grafana
+      restart: on-failure
+      environment:
+        - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      networks:
+        - nistagram-static-network
+      ports:
+        - 3000:3000
+      volumes:
+        - ./monitoring/grafana/data:/var/lib/grafana
+        - ./monitoring/grafana/provision/datasources:/etc/grafana/provisioning/datasources
+        - ./monitoring/grafana/provision/dashboards:/etc/grafana/provisioning/dashboards
+      depends_on:
+        - nistagram-prometheus
+        - nistagram-consul-server
+
+volumes:
+  database-data:
+    name: server-database
+
+
+networks:
+  nistagram-static-network:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16

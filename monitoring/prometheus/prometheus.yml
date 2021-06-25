@@ -1,0 +1,56 @@
+  # my global config
+  global:
+    scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+    evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+    # scrape_timeout is set to the global default (10s).
+
+  # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+  rule_files:
+   - "rules/recording_rules.yml"
+
+  scrape_configs:
+    - job_name: 'prometheus'
+      static_configs:
+        - targets: ['localhost:9090']
+
+    - job_name: 'node'
+      static_configs:
+        - targets: [ 'node-exporter:9100' ]
+
+    - job_name: 'grafana'
+      static_configs:
+        - targets: ['grafana:3000']
+
+    - job_name: 'cAdvisor'
+      static_configs:
+        - targets: [ 'cadvisor:8080' ]
+
+    # preko consul discovery service da scrape metrike sa api gateway
+    # da bi moglo i u drugim servisima da se pristupa metrikama
+    # moralo bi da u njih doda Spring boot actuator
+    - job_name: 'consul'
+      consul_sd_configs:
+        - server: 'nistagram-consul-server:8500'
+      relabel_configs:
+        - source_labels: ['__meta_consul_service']
+          regex: '(.*)'
+          target_label: 'job'
+          replacement: '$1'
+        - source_labels: ['__meta_consul_node']
+          regex: '(.*)'
+          target_label: 'instance'
+          replacement: '$1'
+        - source_labels: ['__meta_consul_tags']
+          regex: ',(dev|product|canary)'
+          target_label: 'group'
+          replacement: '$1'
+        - source_labels: [__metrics_path__]
+          separator: ;
+          regex: /metrics
+          target_label: __metrics_path__
+          replacement: /actuator/prometheus
+          action: replace
+
+
+    # dodati konzul DNS i u svim ovim kontejnerima promeniti im entrypoint.sh
+    # da pokrecu i consul agenta
