@@ -50,7 +50,7 @@ services:
         - nistagram-consul-server
         - database
 
-    # each microservice has own Dockerfile which we use here
+    ## each microservice has own Dockerfile which we use here
     nistagram-auth-service:
       image: auth-service-nistagram
       build:
@@ -70,111 +70,114 @@ services:
       depends_on:
         - nistagram-consul-server
         - database
+        - kafka1
 
     # each microservice has own Dockerfile which we use here
-    # nistagram-campaign-service:
-    #   image: campaign-service-nistagram
-    #   build:
-    #     context: ./Nistagram-Campaign
-    #     dockerfile: Dockerfile
-    #     target: nistagramCampaignMicroserviceRuntimeDev
-    #   environment:
-    #     STAGE: ${STAGE}
-    #     DATABASE_USERNAME: ${DATABASE_USERNAME}
-    #     DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-    #     DATABASE_DOMAIN: ${DATABASE_DOMAIN}
-    #     DATABASE_SCHEMA: ${DATABASE_SCHEMA}
-    #   ports: 
-    #     - "8083:8080"
-    #   networks:
-    #     - nistagram-static-network
-    #   depends_on:
-    #     - nistagram-consul-server
-    #     - database
+    nistagram-campaign-service:
+      image: campaign-service-nistagram
+      build:
+        context: ./Nistagram-Campaign
+        dockerfile: Dockerfile
+        target: nistagramCampaignMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8083:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+        - kafka1
+        - nistagram-auth-service
 
     # each microservice has own Dockerfile which we use here
-    # nistagram-media-service:
-    #   image: media-service-nistagram
-    #   build:
-    #     context: ./Nistagram-Media
-    #     dockerfile: Dockerfile
-    #     target: nistagramMediaMicroserviceRuntimeDev
-    #   environment:
-    #     STAGE: ${STAGE}
-    #     DATABASE_USERNAME: ${DATABASE_USERNAME}
-    #     DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-    #     DATABASE_DOMAIN: ${DATABASE_DOMAIN}
-    #     DATABASE_SCHEMA: ${DATABASE_SCHEMA}
-    #   ports: 
-    #     - "8084:8080"
-    #   networks:
-    #     - nistagram-static-network
-    #   depends_on:
-    #     - nistagram-consul-server
-    #     - database
+    nistagram-media-service:
+      image: media-service-nistagram
+      build:
+        context: ./Nistagram-Media
+        dockerfile: Dockerfile
+        target: nistagramMediaMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8084:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
 
     # each microservice has own Dockerfile which we use here
-    # nistagram-post-service:
-    #   image: post-service-nistagram
-    #   build:
-    #     context: ./Nistagram-Post
-    #     dockerfile: Dockerfile
-    #     target: nistagramPostMicroserviceRuntimeDev
-    #   environment:
-    #     STAGE: ${STAGE}
-    #     DATABASE_USERNAME: ${DATABASE_USERNAME}
-    #     DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-    #     DATABASE_DOMAIN: ${DATABASE_DOMAIN}
-    #     DATABASE_SCHEMA: ${DATABASE_SCHEMA}
-    #   ports: 
-    #     - "8085:8080"
-    #   networks:
-    #     - nistagram-static-network
-    #   depends_on:
-    #     - nistagram-consul-server
-    #     - database
+    nistagram-post-service:
+      image: post-service-nistagram
+      build:
+        context: ./Nistagram-Post
+        dockerfile: Dockerfile
+        target: nistagramPostMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8085:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
 
     # each microservice has own Dockerfile which we use here
-    # nistagram-search-service:
-      # image: search-service-nistagram
-      # build:
-      #   context: ./Nistagram-Search
-      #   dockerfile: Dockerfile
-      #   target: nistagramSearchMicroserviceRuntimeDev
-      # environment:
-      #   STAGE: ${STAGE}
-      #   DATABASE_USERNAME: ${DATABASE_USERNAME}
-      #   DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      #   DATABASE_DOMAIN: ${DATABASE_DOMAIN}
-      #   DATABASE_SCHEMA: ${DATABASE_SCHEMA}
-      # ports: 
-      #   - "8086:8080"
-      # networks:
-      #   - nistagram-static-network
-      # depends_on:
-      #   - nistagram-consul-server
-      #   - database
+    nistagram-search-service:
+      image: search-service-nistagram
+      build:
+        context: ./Nistagram-Search
+        dockerfile: Dockerfile
+        target: nistagramSearchMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8086:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
 
     # each microservice has own Dockerfile which we use here
-    # nistagram-user-service:
-    #   image: user-service-nistagram
-    #   build:
-    #     context: ./Nistagram-User
-    #     dockerfile: Dockerfile
-    #     target: nistagramUserMicroserviceRuntimeDev
-    #   environment:
-    #     STAGE: ${STAGE}
-    #     DATABASE_USERNAME: ${DATABASE_USERNAME}
-    #     DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-    #     DATABASE_DOMAIN: ${DATABASE_DOMAIN}
-    #     DATABASE_SCHEMA: ${DATABASE_SCHEMA}
-    #   ports: 
-    #     - "8087:8080"
-    #   networks:
-    #     - nistagram-static-network
-    #   depends_on:
-    #     - nistagram-consul-server
-    #     - database
+    nistagram-user-service:
+      image: user-service-nistagram
+      build:
+        context: ./Nistagram-User
+        dockerfile: Dockerfile
+        target: nistagramUserMicroserviceRuntimeDev
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+      ports: 
+        - "8087:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
 
   # # ===================>> message queue (Kafka) <<======================
 
@@ -186,9 +189,9 @@ services:
       ports:
         - ${ZOOKEEPER_PORT}:2181
         - ${ZOOKEEPER_PORT_ADMIN}:8080
-      volumes:
-        - ${ZOOKEEPER_PATH}/data:/data
-        - ${ZOOKEEPER_PATH}/datalog:/datalog
+      # volumes:
+        # - ${ZOOKEEPER_PATH}/data:/data
+        # - ${ZOOKEEPER_PATH}/datalog:/datalog
       networks:
         - nistagram-static-network
       depends_on:
@@ -208,8 +211,8 @@ services:
         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
         KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-      volumes:
-        -  ${KAFKA_VOLUME_PATH}:/var/lib/kafka/data
+      # volumes:
+        # -  ${KAFKA_VOLUME_PATH}:/var/lib/kafka/data
       depends_on:
         - zoo1
         - nistagram-consul-server
