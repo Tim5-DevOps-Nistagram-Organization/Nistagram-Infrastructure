@@ -1,1 +1,2 @@
 /monitoring/grafana/data/*
+message_broker/volumes/*

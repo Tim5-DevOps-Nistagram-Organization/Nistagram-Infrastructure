@@ -57,6 +57,12 @@ while ! is_running nistagram-search-service; do sleep 20; done
 # ## remove folder Nistagram-User
 while ! is_running nistagram-user-service; do sleep 20; done
 
+# ## wait zookeeper
+while ! is_running zoo1; do sleep 20; done
+
+# ## wait kafka
+while ! is_running kafka1; do sleep 20; done
+
 
 rm -rf ./Nistagram-Api-Gateway
 rm -rf ./nistagram-front
