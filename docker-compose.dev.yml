@@ -49,7 +49,11 @@ services:
       depends_on:
         - nistagram-consul-server
         - database
-
+        
+    ## each microservice has own Dockerfile which we use here
+    nistagram-auth-service:
+      image: auth-service-nistagram
+      container_name: nistagram-auth
     # each microservice has own Dockerfile which we use here
     nistagram-auth-service:
       image: auth-service-nistagram
@@ -63,6 +67,8 @@ services:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
         DATABASE_DOMAIN: ${DATABASE_DOMAIN}
         DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
       ports: 
         - "8082:8080"
       networks:
@@ -70,6 +76,7 @@ services:
       depends_on:
         - nistagram-consul-server
         - database
+        - kafka1
 
     # each microservice has own Dockerfile which we use here
     nistagram-campaign-service:
@@ -84,6 +91,8 @@ services:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
         DATABASE_DOMAIN: ${DATABASE_DOMAIN}
         DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
       ports: 
         - "8083:8080"
       networks:
@@ -91,6 +100,9 @@ services:
       depends_on:
         - nistagram-consul-server
         - database
+        - kafka1
+        - nistagram-auth-service
+
 
     # each microservice has own Dockerfile which we use here
     nistagram-media-service:
@@ -105,6 +117,8 @@ services:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
         DATABASE_DOMAIN: ${DATABASE_DOMAIN}
         DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
       ports: 
         - "8084:8080"
       networks:
@@ -126,6 +140,8 @@ services:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
         DATABASE_DOMAIN: ${DATABASE_DOMAIN}
         DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
       ports: 
         - "8085:8080"
       networks:
@@ -147,6 +163,8 @@ services:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
         DATABASE_DOMAIN: ${DATABASE_DOMAIN}
         DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
       ports: 
         - "8086:8080"
       networks:
@@ -168,6 +186,8 @@ services:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
         DATABASE_DOMAIN: ${DATABASE_DOMAIN}
         DATABASE_SCHEMA: ${DATABASE_SCHEMA}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
       ports: 
         - "8087:8080"
       networks:
@@ -176,6 +196,45 @@ services:
         - nistagram-consul-server
         - database
 
+  # # ===================>> message queue (Kafka) <<======================
+    zoo1:
+      image: zookeeper:latest
+      container_name: nistagram_zookeeper
+      hostname: ${ZOOKEEPER_HOSTNAME}
+      restart: always
+      ports:
+        - "${ZOOKEEPER_PORT}:2181"
+        - "${ZOOKEEPER_PORT_ADMIN}:8080"
+      # volumes:
+        # - ${ZOOKEEPER_PATH}/data:/data
+        # - ${ZOOKEEPER_PATH}/datalog:/datalog
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    kafka1:
+      image: confluentinc/cp-kafka:latest
+      container_name: nistagram_kafka1
+      hostname: ${KAFKA_HOSTNAME}
+      ports:
+        - "${KAFKA_PORT}:9092"
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: "${ZOOKEEPER_HOSTNAME}:2181"
+        KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-kafka1}:${KAFKA_PORT}
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+        KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      # volumes:
+        # -  ${KAFKA_VOLUME_PATH}:/var/lib/kafka/data
+      depends_on:
+        - zoo1
+        - nistagram-consul-server
+        - database
+      networks:
+        - nistagram-static-network
 
 
   # # ===================>> monitoring services <<======================
