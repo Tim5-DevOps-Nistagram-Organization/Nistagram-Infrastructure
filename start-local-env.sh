@@ -12,7 +12,6 @@ cp -r ../Nistagram-Search ./Nistagram-Search
 cp -r ../Nistagram-User ./Nistagram-User
 
 
-
 if [ ${RUN_BUILD} -eq 1 ]
 then
 # ## mora ovako zbog [output clipped, log limit 1MiB reached]
@@ -43,5 +42,4 @@ echo "Finished builds"
 fi
 
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./docker-compose.dev.yml --env-file ./config/.env.dev up -d
-
 

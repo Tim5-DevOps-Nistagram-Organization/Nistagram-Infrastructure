@@ -49,11 +49,14 @@ services:
       depends_on:
         - nistagram-consul-server
         - database
-
+        
     ## each microservice has own Dockerfile which we use here
     nistagram-auth-service:
       image: auth-service-nistagram
       container_name: nistagram-auth
+    # each microservice has own Dockerfile which we use here
+    nistagram-auth-service:
+      image: auth-service-nistagram
       build:
         context: ./Nistagram-Auth
         dockerfile: Dockerfile
@@ -99,6 +102,7 @@ services:
         - database
         - kafka1
         - nistagram-auth-service
+
 
     # each microservice has own Dockerfile which we use here
     nistagram-media-service:
@@ -193,7 +197,6 @@ services:
         - database
 
   # # ===================>> message queue (Kafka) <<======================
-
     zoo1:
       image: zookeeper:latest
       container_name: nistagram_zookeeper

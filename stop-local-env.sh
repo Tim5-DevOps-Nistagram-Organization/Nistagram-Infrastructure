@@ -10,3 +10,4 @@ rm -rf ./Nistagram-Post
 rm -rf ./Nistagram-User
 
 docker rm -f $(docker ps -a -q)
+
