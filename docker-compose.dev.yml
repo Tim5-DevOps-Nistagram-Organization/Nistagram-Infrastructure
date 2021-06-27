@@ -53,6 +53,7 @@ services:
     ## each microservice has own Dockerfile which we use here
     nistagram-auth-service:
       image: auth-service-nistagram
+      container_name: nistagram-auth
       build:
         context: ./Nistagram-Auth
         dockerfile: Dockerfile
@@ -265,13 +266,13 @@ services:
         - nistagram-static-network
       depends_on:
         - nistagram-consul-server
-        # - nistagram-user-service
-        # - nistagram-search-service
+        - nistagram-user-service
+        - nistagram-search-service
         - nistagram-gateway
         - nistagram-auth-service
-        # - nistagram-campaign-service
-        # - nistagram-media-service
-        # - nistagram-post-service
+        - nistagram-campaign-service
+        - nistagram-media-service
+        - nistagram-post-service
 
     # visualise monitoring
     nistagram-grafana:
