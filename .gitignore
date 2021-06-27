@@ -1,2 +1,3 @@
 /monitoring/grafana/data/*
 message_broker/volumes/*
+database/Postgres/data/*

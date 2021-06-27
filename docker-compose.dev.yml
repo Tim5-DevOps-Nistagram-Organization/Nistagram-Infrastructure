@@ -9,11 +9,22 @@ services:
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_DB: ${POSTGRES_DB}
       volumes:
-        - database-data:/var/lib/postgresql/data
+        - ./database/Postgres/init:/docker-entrypoint-initdb.d
+        #- ./database/Postgres/data:/var/lib/postgresql/data
       networks:
         - nistagram-static-network
       ports:
         - 5432
+      depends_on:
+        - nistagram-consul-server
+        
+    adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 10010:8080
+      networks:
+        - nistagram-static-network
       depends_on:
         - nistagram-consul-server
 
