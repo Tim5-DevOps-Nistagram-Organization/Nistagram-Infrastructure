@@ -2,7 +2,7 @@
 FROM node:13.12.0-alpine as frontEndBuild
 
 ARG PROTOCOL="http"
-ARG API="localhost:8081"
+ARG API="localhost:8088"
 
 # set working directory
 WORKDIR /usr/src
