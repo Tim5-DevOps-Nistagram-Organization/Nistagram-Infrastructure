@@ -1,0 +1,295 @@
+version: "3.8"
+services:
+    database:
+      image: postgres:${POSTGRES_VERSION-13}
+      container_name: postgres
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_USER: ${POSTGRES_USER}
+      volumes:
+        - ./volumes/database/Postgres/init:/docker-entrypoint-initdb.d
+        #- ./database/Postgres/data:/var/lib/postgresql/data
+      networks:
+        - nistagram-static-network
+      ports:
+        - 5432
+      depends_on:
+        - nistagram-consul-server
+        
+    adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 10010:8080
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+
+    nistagram-consul-server:
+      image: consul-server
+      container_name: nistagram-consul-server
+      build:
+        context: .
+        dockerfile: Dockerfile
+        target: consulServerDev
+      ports: 
+        - "8501:8500"
+      networks:
+        nistagram-static-network:
+          ipv4_address: 172.19.0.2
+ 
+    nistagram-gateway:
+      image: gateway-nistagram
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA_GATEWAY}
+      ports: 
+        - "8088:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+        
+    nistagram-auth-service:
+      image: auth-service-nistagram
+      container_name: nistagram-auth
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA_AUTH}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
+      ports: 
+        - "8082:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+        - kafka1
+
+    nistagram-campaign-service:
+      image: campaign-service-nistagram
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA_CAMPAIGN}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
+      ports: 
+        - "8083:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+        - kafka1
+        - nistagram-auth-service
+
+
+    nistagram-media-service:
+      image: media-service-nistagram
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA_MEDIA}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
+      ports: 
+        - "8084:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+      volumes:
+        - ${MEDIA_VOLUME_PATH}:/mediaFolder
+
+    nistagram-post-service:
+      image: post-service-nistagram
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA_POST}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
+      ports: 
+        - "8085:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    nistagram-search-service:
+      image: search-service-nistagram
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA_SEARCH}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
+      ports: 
+        - "8086:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    nistagram-user-service:
+      image: user-service-nistagram
+      environment:
+        STAGE: ${STAGE}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_DOMAIN: ${DATABASE_DOMAIN}
+        DATABASE_SCHEMA: ${DATABASE_SCHEMA_USER}
+        KAFKA_DOMAIN: ${KAFKA_HOSTNAME}
+        KAFKA_PORT: ${KAFKA_PORT}
+      ports: 
+        - "8087:8080"
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+  # # ===================>> message queue (Kafka) <<======================
+    zoo1:
+      image: zookeeper:latest
+      container_name: nistagram_zookeeper
+      hostname: ${ZOOKEEPER_HOSTNAME}
+      restart: always
+      ports:
+        - "${ZOOKEEPER_PORT}:2181"
+        - "${ZOOKEEPER_PORT_ADMIN}:8080"
+      # volumes:
+        # - ${ZOOKEEPER_PATH}/data:/data
+        # - ${ZOOKEEPER_PATH}/datalog:/datalog
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - database
+
+    kafka1:
+      image: confluentinc/cp-kafka:latest
+      container_name: nistagram_kafka1
+      hostname: ${KAFKA_HOSTNAME}
+      ports:
+        - "${KAFKA_PORT}:9092"
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: "${ZOOKEEPER_HOSTNAME}:2181"
+        KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-kafka1}:${KAFKA_PORT}
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+        KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      # volumes:
+        # -  ${KAFKA_VOLUME_PATH}:/var/lib/kafka/data
+      depends_on:
+        - zoo1
+        - nistagram-consul-server
+        - database
+      networks:
+        - nistagram-static-network
+
+
+  # # ===================>> monitoring services <<======================
+    nistagram-prometheus:
+      image: prom/prometheus:latest
+      container_name: prometheus
+      ports:
+        - 9090:9090
+      command:
+        - --config.file=/etc/prometheus/prometheus.yml
+      volumes:
+        - ./monitoring/prometheus/:/etc/prometheus/
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - nistagram-cadvisor
+        - nistagram-node-exporter
+
+    # monitor Linux machine
+    nistagram-node-exporter:
+      image: prom/node-exporter:v1.1.2
+      container_name: node-exporter
+      networks:
+        - nistagram-static-network
+      ports:
+        - 9100:9100
+      depends_on:
+        - nistagram-consul-server
+        - nistagram-cadvisor
+
+    # monitor containers
+    nistagram-cadvisor:
+      image: gcr.io/cadvisor/cadvisor:latest
+      container_name: cadvisor
+      ports:
+        - 8081:8080
+      volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      networks:
+        - nistagram-static-network
+      depends_on:
+        - nistagram-consul-server
+        - nistagram-user-service
+        - nistagram-search-service
+        - nistagram-gateway
+        - nistagram-auth-service
+        - nistagram-campaign-service
+        - nistagram-media-service
+        - nistagram-post-service
+
+    # visualise monitoring
+    nistagram-grafana:
+      image: grafana/grafana:8.0.3
+      container_name: grafana
+      restart: on-failure
+      environment:
+        - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      networks:
+        - nistagram-static-network
+      ports:
+        - 3000:3000
+      volumes:
+        - ./monitoring/grafana/data:/var/lib/grafana
+        - ./monitoring/grafana/provision/datasources:/etc/grafana/provisioning/datasources
+        - ./monitoring/grafana/provision/dashboards:/etc/grafana/provisioning/dashboards
+      depends_on:
+        - nistagram-prometheus
+        - nistagram-consul-server
+
+volumes:
+  database-data:
+    name: server-database
+
+
+networks:
+  nistagram-static-network:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
