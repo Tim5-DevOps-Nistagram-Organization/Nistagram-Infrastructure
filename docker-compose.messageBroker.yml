@@ -49,6 +49,3 @@ services:
         # -  ${KAFKA_VOLUME_PATH}:/var/lib/kafka/data
       depends_on:
         - zoo1
-
-
-
