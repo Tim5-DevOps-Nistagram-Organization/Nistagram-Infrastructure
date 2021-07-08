@@ -3,7 +3,6 @@
 RUN_BUILD=${1:-0}
 
 cp -r ../Nistagram-Api-Gateway ./Nistagram-Api-Gateway
-cp -r ../nistagram-front ./nistagram-front
 cp -r ../Nistagram-Auth ./Nistagram-Auth
 cp -r ../Nistagram-Campaign ./Nistagram-Campaign
 cp -r ../Nistagram-Media ./Nistagram-Media
@@ -18,7 +17,7 @@ then
 docker buildx create --use --name larger_log --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=50000000
 
 # ## Build Nistagram-Api-Gateway microsrevice
-docker buildx build --load --progress plain . --target gatewayRuntimeDev --tag gateway-nistagram
+docker buildx build --load --progress plain ./Nistagram-Api-Gateway --target gatewayRuntimeDev --tag gateway-nistagram
 
 # ## Build Auth microservice
 docker buildx build --load --progress plain ./Nistagram-Auth --target nistagramAuthMicroserviceRuntimeDev --tag auth-service-nistagram

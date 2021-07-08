@@ -41,7 +41,7 @@ services:
           ipv4_address: 172.19.0.2
  
     nistagram-gateway:
-      image: gateway-nistagram
+      image: dusanbucan/nistagramapigateway
       environment:
         STAGE: ${STAGE}
         DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -57,7 +57,7 @@ services:
         - database
         
     nistagram-auth-service:
-      image: auth-service-nistagram
+      image: dusanbucan/nistagramauth
       container_name: nistagram-auth
       environment:
         STAGE: ${STAGE}
@@ -77,7 +77,7 @@ services:
         - kafka1
 
     nistagram-campaign-service:
-      image: campaign-service-nistagram
+      image: dusanbucan/nistagramcampaign
       environment:
         STAGE: ${STAGE}
         DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -98,7 +98,7 @@ services:
 
 
     nistagram-media-service:
-      image: media-service-nistagram
+      image: dusanbucan/nistagrammedia
       environment:
         STAGE: ${STAGE}
         DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -118,7 +118,7 @@ services:
         - ${MEDIA_VOLUME_PATH}:/mediaFolder
 
     nistagram-post-service:
-      image: post-service-nistagram
+      image: dusanbucan/nistagrampost
       environment:
         STAGE: ${STAGE}
         DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -136,7 +136,7 @@ services:
         - database
 
     nistagram-search-service:
-      image: search-service-nistagram
+      image: dusanbucan/nistagramsearch
       environment:
         STAGE: ${STAGE}
         DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -154,7 +154,7 @@ services:
         - database
 
     nistagram-user-service:
-      image: user-service-nistagram
+      image: dusanbucan/nistagramuser
       environment:
         STAGE: ${STAGE}
         DATABASE_USERNAME: ${DATABASE_USERNAME}
