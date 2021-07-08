@@ -8,3 +8,24 @@ The repository contains:
 
 System architecture:
 ![System architecture](https://user-images.githubusercontent.com/40805992/122745172-03245f80-d289-11eb-8382-b8d217a19fa5.jpeg)
+
+Nistagram-Auth uml class diagram:<br />
+![Nistagram-Auth uml class diagram](http://www.plantuml.com/plantuml/png/VP1DJiCm48NtFiMe-oxOPjMGM1MeL92V0nWo10l_LFQOWYhkZYSLD2hGZJt-v3VptgmYgK396e4kMMYyGJW8W4Qk-qtPvAfSost7TtrtinMVulYn7D5HWwEE51HfxrfIz2rzw6NRoPf5LINlkMHyAoikSuidesA4Fc8e4xrCAZqKiF5kp6NAt2cB1RGKz8Hs-V_UXs66q2fjPkyzFaPDs8Sv3DvWCQNAZpSC-bbZRdBjCr7kPANph-ZEVH33-SJtdGuVjQBSai-J_DSsu02NCy5v0lWp0jD8FF6VZRE7e_d5rGAMIxv-5YjMw8PapHS0)
+
+Nistagram-Campaign uml class diagram:<br />
+![Nistagram-Campaign uml class diagram](http://www.plantuml.com/plantuml/png/NP31QeOm48JlUOebnuA7NdEor582jWZg0soR9GsOACbQaT9tx-AX-l-NCBFPV3EaBeoPrpWfIck4OLy8VXH0RzzVsnSHRsCxs4xahrAV4vO2pnWN33uTUy4PQEVaHRAyDGT1p85ro39fv9G99TTSlSJrN_FMKMvmDs0JawSi5-WfyLWe6-WvX-JFw2VtJPb3eIWhz_cHN41x-eq-Ic0QytG5gV_w-b53LO5-qBTSLKjL-P4_)
+
+Nistagram-Media uml class diagram:<br />
+![Nistagram-Media uml class diagram](http://www.plantuml.com/plantuml/png/SoWkIImgAStDuKhEIImkLl1DJSbCLAZcKb38JB5IyCdFImSo2n9BCgmKWakACe7SMYw7rBmKe0u0)
+
+Nistagram-Post uml class diagram:<br />
+![Nistagram-Post uml class diagram](http://www.plantuml.com/plantuml/png/XL5BReCm4Dtx51RBIbbaooeIeH9j-ca81vZ225d21da6PL7bxhKT4gYBsfLdtkUXUUo8mVAeEu5crFA8KBFgJUwNBo7beNZEtRCloZ1ThhBAm33OVh0A69kiDuo6ItPBC1tpZoelJ_dUpTdRwsDnVF6pmv_opCCN8UeEY6JMQ-simQMQL1vwqxfH8n6qcCgIhGf80-pMFJ3EvlUULfoDWcBU6wJQgi7VT4kR0qxGndvMtE4lvRsNM6udFFtHtEnRBIeE8VR7_L7gVtTKX3OE7HrcG2yxH0sgM-nd_2J5MDbk6HbQJHuIkTd8P9jSmzEGj-Jyumjq54DB4xMzKzEVJMLz7KXCI9oTohDLZ5RS6em5guJ_d5XlDxQlg-Ai7PfcrDqt)
+
+Nistagram-Search uml class diagram:<br />
+![Nistagram-Search uml class diagram](http://www.plantuml.com/plantuml/png/TLBBJiCm4BpdAwmS4JrmzQb0AcGHK4JQ3p3n4YpvKTcRLXNYtrc7A4aJzMBjpansCsDl8yg0dJKPkCwo_UK8x2TZh1RlB-MEYhT3kHSLbR_Pl-G3P8FQkrrgahGKhqbOY3fLITSO6IDxL2S8g2DOSDWhjUAizAwbqeBIKapz6JwZHZW4mrcDGHCu3dgMzYXrwvOpcW4N0tHF6981tjkWflUc919Iq4a8E5NCU_9GV_jp1Q6G5yw4GsWXJAih7rU_VYHCt7RI1908QbWnJXfYMva80oxM4B_AUXgrb-ro2ceqi4xk424ifHrXJjf9JQbOgSsirx4A-jJdzEIz0Ubktj1uD_bTpZORbZ_a_LREP0iEPpmHn9Fi-c5aAMA2HpQvumnb6oTgDZWRWvmHIJWHoo_ICT_GzvnzUMFycNpS4jWEGMLRSAgpvWy0)
+
+Nistagram-User uml class diagram:<br />
+![Nistagram-User uml class diagram](http://www.plantuml.com/plantuml/png/VOxDIiKm48NtUOhXBeNx0bbTBYu5nU83JCsq7SXFdPbOH7ntqww2O5V9zvrpO6vgA5PJTEyHLU5DIU3R0N3my5JotBwrkOo9F0mcV2XAoB7ZF_6wbDppJ3b8Bm8QFKzt5biyF3PeRgDnOEjR8vTPS5s-EiVw8lo9U-zUIYJCxiUvu-pBmmMkr-FPsSDKOYnRsvtc9FfFdgfHEDs-qaSbDNKtog6c-0i0)
+
+Agent uml class diagram:<br />
+![Agent uml class diagram](http://www.plantuml.com/plantuml/png/RL0zImGn4EtpAuOjXJkqlUeKcmFHWot58fSCos8oevENuX3_kt5rLvQpc_SoUH-pB_26cfCBoPT2HzDO0-Z3ZP5szA0oEF6Pszp3neRUR0pVy5xhAR5JwQ7XTKS70GziBd9YSDpHdMfYB-xpL_gG_S0huQ025ZHuEeEVN_vMmNcr-LwzOCIP5f-V74kC-UUJHRQrIItGp7ZqcUSI2zbNa__usnYDIrbuA7mwhffJyvolrTrqjDbGTxtTjcagUl5srKsrt9JmWjspn9hJ5m00)
